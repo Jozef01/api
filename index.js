@@ -13,7 +13,6 @@ import keys from "./Config/keys.js";
 import { errorHandler, notFound } from "./Middleware/errorHandler.js";
 import { auth, message, parcel, track } from "./Router/index.js";
 import DB from "./Utils/db.js";
-import { nanoid } from "nanoid";
 
 const app = express();
 const PORT = keys.app.port || 4000;
@@ -32,10 +31,6 @@ app.use("/api/v1/parcel", parcel);
 app.use("/api/v1/message", message);
 //localhost:{post}/parcel/{endpoint}
 app.use("/parcel", track);
-
-app.get("/cookies", (req, res) => {
-  console.log(nanoid());
-});
 
 app.use(notFound);
 app.use(errorHandler);

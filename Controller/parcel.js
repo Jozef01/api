@@ -6,12 +6,11 @@ export default class ParcelController {
     const { sender, recipient } = req.body;
 
     const trackingNumber = nanoid();
-    // Create a new parcel with initial tracking information
     const newParcel = new parcelModel({
       trackingNumber,
       sender,
       recipient,
-      user: req.user._id, // Associate the user's ID with the parcel
+      user: req.user._id,
       status: "Pending",
       trackingInfo: [
         {
@@ -31,14 +30,12 @@ export default class ParcelController {
       req.body;
     const parcelId = req.params.id;
 
-    // Find the parcel by ID
     const parcel = await parcelModel.findById(parcelId);
     if (!parcel) {
       res.status(404);
       throw new Error("Parcel not found");
     }
 
-    // Check if the user has permission to update the parcel
     if (parcel.user.toString() !== req.user._id.toString()) {
       res.status(403);
       throw new Error(
@@ -46,7 +43,6 @@ export default class ParcelController {
       );
     }
 
-    // Update parcel details
     parcel.trackingNumber = trackingNumber || parcel.trackingNumber;
     parcel.sender = sender || parcel.sender;
     parcel.recipient = recipient || parcel.recipient;
@@ -62,14 +58,12 @@ export default class ParcelController {
     const { status, location } = req.body;
     const parcelId = req.params.id;
 
-    // Find the parcel by ID
     const parcel = await parcelModel.findById(parcelId);
     if (!parcel) {
       res.status(404);
       throw new Error("Parcel not found");
     }
 
-    // Check if the user has permission to update the parcel
     if (parcel.user.toString() !== req.user._id.toString()) {
       res.status(403);
       throw new Error(
@@ -77,11 +71,9 @@ export default class ParcelController {
       );
     }
 
-    // Add tracking information to the parcel
     parcel.trackingInfo.push({ status, location });
     parcel.status = status;
 
-    // Update delivery date if status is 'Delivered'
     if (status === "Delivered") {
       parcel.deliveryDate = new Date();
     }
@@ -92,7 +84,6 @@ export default class ParcelController {
 
   // Controller to get all parcels for the current user
   static async getAllParcels(req, res) {
-    // Fetch all parcels for the current user
     const parcels = await parcelModel.find({ user: req.user._id });
     res.json(parcels);
   }
@@ -101,14 +92,12 @@ export default class ParcelController {
   static async getParcelById(req, res) {
     const parcelId = req.params.id;
 
-    // Find the parcel by ID
     const parcel = await parcelModel.findById(parcelId);
     if (!parcel) {
       res.status(404);
       throw new Error("Parcel not found");
     }
 
-    // Check if the user has permission to view the parcel
     if (parcel.user.toString() !== req.user._id.toString()) {
       res.status(403);
       throw new Error(
@@ -125,7 +114,6 @@ export default class ParcelController {
 
     const parcel = await parcelModel.findById(parcelId);
 
-    // Check if the user has permission to delete the parcel
     if (parcel.user.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         error:
@@ -133,7 +121,6 @@ export default class ParcelController {
       });
     }
 
-    // Find the parcel by ID and delelte
     const check = await parcelModel.findByIdAndDelete(parcelId);
     if (!check) {
       res.status(404);
@@ -149,14 +136,12 @@ export default class ParcelController {
     const { trackingNumber, sender, recipient, status } = req.body;
     const parcelId = req.params.id;
 
-    // Find the parcel by ID
     const parcel = await parcelModel.findById(parcelId);
     if (!parcel) {
       res.status(404);
       throw new Error("Parcel not found");
     }
 
-    // Update parcel details (admin only)
     parcel.trackingNumber = trackingNumber || parcel.trackingNumber;
     parcel.sender = sender || parcel.sender;
     parcel.recipient = recipient || parcel.recipient;
@@ -168,7 +153,6 @@ export default class ParcelController {
 
   // Controller to get all parcels for all users (admin only)
   static async getAllParcelsAdmin(req, res) {
-    // Fetch all parcels for all users (admin only)
     if (req.user.role !== "admin") {
       res.status(403);
       throw new Error(
@@ -184,7 +168,6 @@ export default class ParcelController {
   static async getParcelsByUserIdAdmin(req, res) {
     const userId = req.params.userId;
 
-    // Fetch all parcels for the specified user (admin only)
     if (req.user.role !== "admin") {
       res.status(403);
       throw new Error(
@@ -200,13 +183,12 @@ export default class ParcelController {
   static async deleteParcelAdmin(req, res) {
     const parcelId = req.params.id;
 
-    // Check if the user has permission to delete the parcel (admin only)
     if (req.user.role !== "admin") {
       return res
         .status(403)
         .json({ error: "Unauthorized - Only admin users can delete parcels" });
     }
-    // Find the parcel by ID
+
     const check = await parcelModel.findById(parcelId);
     if (!check) {
       res.status(404);

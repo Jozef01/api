@@ -71,9 +71,9 @@ export const authValidator = {
 
 export const parcelValidator = {
   create: [
-    body("trackingNumber")
-      .notEmpty()
-      .withMessage("Tracking number is required"),
+    // body("trackingNumber")
+    //   .notEmpty()
+    //   .withMessage("Tracking number is required"),
     body("sender.name").notEmpty().withMessage("Sender name is required"),
     body("sender.address").notEmpty().withMessage("Sender address is required"),
     body("sender.phone").notEmpty().withMessage("Sender phone is required"),

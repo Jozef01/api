@@ -9,16 +9,19 @@ const router = Router();
 
 router.use(AuthMiddleware);
 
+router.post(
+  "/addtrackinginfo",
+  expressAsyncHandler(ParcelController.addTrackingInfo),
+);
 /* USER ONLY */
-
 // Get a list of all parcels
 router.get("/list", expressAsyncHandler(ParcelController.getAllParcels));
 // Get a specific parcel by ID
-router.get("/parcels/:id", expressAsyncHandler(ParcelController.getParcelById));
+router.get("/list/:id", expressAsyncHandler(ParcelController.getParcelById));
 //Create a new Parcel
 router.post(
   "/create",
-  // parcelValidator.create,
+  parcelValidator.create,
   expressAsyncHandler(ParcelController.createParcel),
 );
 //Edit a Parcel by ID
@@ -37,7 +40,7 @@ router.get(
 );
 // Get a specific parcel by ID
 router.get(
-  "/parcels/admin/:id",
+  "/list/admin/:id",
   expressAsyncHandler(ParcelController.getParcelsByUserIdAdmin),
 );
 //Edit a Parcel by ID

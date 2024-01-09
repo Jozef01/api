@@ -8,7 +8,7 @@ const parcelSchema = new Schema({
   },
   user: {
     type: Types.ObjectId,
-    ref: "User", // Reference to the User model
+    ref: "User",
   },
   sender: {
     name: String,

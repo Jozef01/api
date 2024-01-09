@@ -6,7 +6,6 @@ import authModel from "../Model/auth.js";
 
 export default class AuthController {
   static async createUser(req, res) {
-    // Check if the user is an admin
     if (req.user.role !== "admin") {
       res.status(403);
       throw new Error("Unauthorized - Only admin users can create new user");
@@ -14,7 +13,6 @@ export default class AuthController {
 
     const { username, email, password } = req.body;
 
-    // Check if the username or email is already in use
     const existingUser = await authModel.findOne({
       $or: [{ username }, { email }],
     });
@@ -49,14 +47,12 @@ export default class AuthController {
     const { username, email, password } = req.body;
     const userId = req.params.id;
 
-    // Check if the user exists
     const existingUser = await authModel.findById(userId);
     if (!existingUser) {
       res.status(404);
       throw new Error("User not found");
     }
 
-    // Update the user details
     existingUser.username = username;
     existingUser.email = email;
 
@@ -80,15 +76,13 @@ export default class AuthController {
 
     const userId = req.params.id;
 
-    // Check if the user exists
     const check = await authModel.findByIdAndDelete(userId);
     if (!check) {
       res.status(402);
       throw new Error("Can't delete user");
     }
 
-    // Delete the user
-    res.json({ message: "User deleted successfully" });
+    res.json({ success: true, message: "User deleted successfully" });
   }
 
   // Controller to get a list of all users (admin only)
@@ -100,14 +94,13 @@ export default class AuthController {
       );
     }
     const users = await authModel.find();
-    res.json(users);
+    res.status(200).json({ success: true, users });
   }
 
   // Controller to get a specific user by ID (admin only)
   static async getUserById(req, res) {
     const userId = req.params.id;
 
-    // Check if the user exists
     const user = await authModel.findById(userId);
 
     if (!user) {
@@ -115,19 +108,17 @@ export default class AuthController {
       throw new Error("User not found");
     }
 
-    res.json(user);
+    res.json({ success: true, user });
   }
 
   // Controller to authenticate and generate a JWT token
   static async loginUser(req, res) {
     const { value, password } = req.body;
 
-    // Find the user by username
     const user = await authModel.findOne({
       $or: [{ username: value }, { email: value }],
     });
 
-    // Check if the user exists and the password is correct
     if (!user || !(await bcryptjs.compare(password, user.password))) {
       res.status(401);
       throw new Error("Invalid Credentials");
@@ -139,24 +130,22 @@ export default class AuthController {
       role: user.role,
     };
 
-    // Generate a JWT token
     const token = `Bearer ${jwt.sign(payload, keys.jwt.secret, {
-      expiresIn: keys.jwt.tokenLife, // Token expiration time
+      expiresIn: keys.jwt.tokenLife,
     })}`;
-    // Set the token as an HTTP-only cookie
-    res.cookie("jwt", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "proudction",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+
+    // res.cookie("jwt", token, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "proudction",
+    //   sameSite: "strict",
+    //   maxAge: 7 * 24 * 60 * 60 * 1000,
+    // });
 
     res.json({ success: true, message: "Login successful", token });
   }
 
   static async logoutUser(req, res) {
-    // Clear the JWT cookie
     res.clearCookie("jwt");
-    res.json({ message: "Logout successful" });
+    res.json({ success: true, message: "Logout successful" });
   }
 }

@@ -46,10 +46,6 @@ router.delete(
   expressAsyncHandler(AuthController.deleteUser),
 );
 // Logout and clear the JWT cookie
-router.post(
-  "/logout",
-  // AuthMiddleware,
-  expressAsyncHandler(AuthController.logoutUser),
-);
+router.post("/logout", expressAsyncHandler(AuthController.logoutUser));
 
 export default router;
